@@ -4,7 +4,7 @@ WORKDIR /usr/src/app/ui
 
 COPY package*.json ./
 
-RUN npm install -g @angular-devkit/build-angular && npm ci
+RUN npm ci -g @angular-devkit/build-angular && npm ci
 
 EXPOSE 4201
 
