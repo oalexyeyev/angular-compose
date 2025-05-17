@@ -1,0 +1,32 @@
+name: docker-compose-actions-workflow
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+             
+      - name: Run the stack
+        run: docker compose up -d
+              
+      - name: Check if docker-compose has the service 'nodejs-server'
+        run: docker compose ps --services | grep nodejs-server
+      
+      - name: Check if docker-compose has the service 'angular-ui'
+        run: docker compose ps --services | grep angular-ui
+
+      - name: Wait for server to be ready
+        run: |
+          for i in {1..10}; do
+            curl --silent --fail http://localhost:4201 && break
+            echo "Waiting for server..."
+            sleep 5
+          done  
+      - name: Test containers functionality
+        uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_BASE_URL: http://localhost:3080
+          CYPRESS_ANGULAR_URL: http://localhost:4201
+        with:
+          working-directory: ./.github/tests
+        
